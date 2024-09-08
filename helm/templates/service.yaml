@@ -11,17 +11,3 @@ spec:
     - protocol: TCP
       port: {{ .Values.ingressEntryPointPort }}
       targetPort: 5000
-
----
-apiVersion: helm.cattle.io/v1
-kind: HelmChartConfig
-metadata:
-  name: traefik
-  namespace: kube-system
-spec:
-  valuesContent: |-
-    ports:
-      {{ .Values.ingressEntryPointName }}:
-        port: {{ .Values.ingressEntryPointPort }}
-        expose: true
-        exposedPort: {{ .Values.ingressEntryPointPort }}
