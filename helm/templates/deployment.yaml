@@ -1,0 +1,67 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.appName }}
+  namespace: {{ .Values.namespace }}
+  labels:
+      app.kubernetes.io/name: {{ .Values.appName }}
+  annotations:
+    source_url: "git@github.com:krzysztofkarolak/sms-alerts-pubsub.git"
+spec:
+  replicas: 1
+  minReadySeconds: 10
+  progressDeadlineSeconds: 60
+
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Values.appName }}
+
+  template:
+    metadata:
+      name: {{ .Values.appName }}
+      namespace: {{ .Values.namespace }}
+      labels:
+        app.kubernetes.io/name: {{ .Values.appName }}
+      annotations:
+        source_url: "git@github.com:krzysztofkarolak/sms-alerts-pubsub.git"
+    spec:
+      nodeSelector:
+        beta.kubernetes.io/arch: amd64
+
+      restartPolicy: Always
+
+      imagePullSecrets:
+        - name: {{ .Values.registrySecretName }}
+
+      containers:
+        - name: sms-alerts-pubsub
+          image: {{ .Values.image }}
+          imagePullPolicy: IfNotPresent
+
+          env:
+            - name: GOOGLE_SERVICE_ACCOUNT_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: GOOGLE_SERVICE_ACCOUNT_KEY
+                  name: {{ .Values.secretName }}
+            - name: PUBSUB_TOPIC_NAME
+              valueFrom:
+                secretKeyRef:
+                  key: PUBSUB_TOPIC_NAME
+                  name: {{ .Values.secretName }}
+            - name: GOOGLE_PROJECT_NAME
+              valueFrom:
+                secretKeyRef:
+                  key: GOOGLE_PROJECT_NAME
+                  name: {{ .Values.secretName }}
+            - name: DEFAULT_PHONE_NUMBER
+              value: {{ .Values.defaultPhoneNumber }}
+
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "20m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
