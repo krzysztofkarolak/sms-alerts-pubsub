@@ -7,3 +7,4 @@ ingressRouteMatch: "Host(`sms.example.local`)"
 ingressEntryPointName: "sms-alerts"
 ingressEntryPointPort: "80"
 defaultPhoneNumber: "123456789"
+replicaCount: 1
