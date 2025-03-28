@@ -23,6 +23,7 @@ spec:
         app.kubernetes.io/name: {{ .Values.appName }}
       annotations:
         source_url: "git@github.com:krzysztofkarolak/sms-alerts-pubsub.git"
+    spec:
 
       restartPolicy: Always
 
