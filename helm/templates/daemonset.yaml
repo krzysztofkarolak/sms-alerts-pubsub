@@ -1,6 +1,6 @@
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
   name: {{ .Values.appName }}
   namespace: {{ .Values.namespace }}
@@ -9,9 +9,7 @@ metadata:
   annotations:
     source_url: "git@github.com:krzysztofkarolak/sms-alerts-pubsub.git"
 spec:
-  replicas: {{ .Values.replicaCount }}
   minReadySeconds: 10
-  progressDeadlineSeconds: 60
 
   selector:
     matchLabels:
@@ -25,9 +23,6 @@ spec:
         app.kubernetes.io/name: {{ .Values.appName }}
       annotations:
         source_url: "git@github.com:krzysztofkarolak/sms-alerts-pubsub.git"
-    spec:
-      nodeSelector:
-        beta.kubernetes.io/arch: amd64
 
       restartPolicy: Always
 
