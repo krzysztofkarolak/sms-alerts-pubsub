@@ -24,7 +24,13 @@ default_phone_number = os.environ.get("DEFAULT_PHONE_NUMBER")
 @app.route("/webhook", methods=["POST"])
 def handle_webhook():
     try:
-        data = request.json
+        try:
+            data = request.get_json(force=True)
+        except Exception as e:
+            return {"status": "error", "message": "Invalid JSON payload"}, 400
+
+        if not isinstance(data, dict):
+            return {"status": "error", "message": "JSON payload must be an object"}, 400
 
         alert_message = data.get("message", "An alert was triggered.")
         phone_number = data.get("phone_number", default_phone_number)
