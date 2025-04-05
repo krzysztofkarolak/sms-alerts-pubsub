@@ -26,13 +26,25 @@ def handle_webhook():
     try:
         try:
             data = request.get_json(force=True)
-        except Exception as e:
+        except Exception:
             return {"status": "error", "message": "Invalid JSON payload"}, 400
 
-        if not isinstance(data, dict):
-            return {"status": "error", "message": "JSON payload must be an object: " + str(data)}, 400
+        if isinstance(data, str):
+            try:
+                data = json.loads(data)
+            except json.JSONDecodeError:
+                return {"status": "error", "message": "Failed to parse inner JSON string"}, 400
 
-        alert_message = data.get("message", "An alert was triggered.")
+        if not isinstance(data, dict):
+            return {"status": "error", "message": "JSON payload must be an object"}, 400
+
+        message = data.get("message", "An alert was triggered.")
+        if not isinstance(message, str):
+            return {"status": "error", "message": "Message must be a string"}, 400
+
+        sanitized_message = message.replace("\n", " ").replace("\\", "").strip()
+
+        alert_message = sanitized_message
         phone_number = data.get("phone_number", default_phone_number)
 
         pubsub_message = {
