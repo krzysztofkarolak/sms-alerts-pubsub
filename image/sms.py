@@ -30,7 +30,7 @@ def handle_webhook():
             return {"status": "error", "message": "Invalid JSON payload"}, 400
 
         if not isinstance(data, dict):
-            return {"status": "error", "message": "JSON payload must be an object"}, 400
+            return {"status": "error", "message": "JSON payload must be an object: " + str(data)}, 400
 
         alert_message = data.get("message", "An alert was triggered.")
         phone_number = data.get("phone_number", default_phone_number)
