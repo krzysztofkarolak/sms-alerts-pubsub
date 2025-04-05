@@ -1,5 +1,6 @@
 import os
 import json
+import re
 from flask import Flask, request, jsonify
 from google.cloud import pubsub_v1
 from google.oauth2 import service_account
@@ -24,27 +25,10 @@ default_phone_number = os.environ.get("DEFAULT_PHONE_NUMBER")
 @app.route("/webhook", methods=["POST"])
 def handle_webhook():
     try:
-        try:
-            data = request.get_json(force=True)
-        except Exception:
-            return {"status": "error", "message": "Invalid JSON payload"}, 400
+        raw = request.data.decode("utf-8").replace('\\"', '"').replace('"{', '{').replace('}"', '}')
+        data = json.loads(raw)
 
-        if isinstance(data, str):
-            try:
-                data = json.loads(data)
-            except json.JSONDecodeError:
-                return {"status": "error", "message": "Failed to parse inner JSON string"}, 400
-
-        if not isinstance(data, dict):
-            return {"status": "error", "message": "JSON payload must be an object"}, 400
-
-        message = data.get("message", "An alert was triggered.")
-        if not isinstance(message, str):
-            return {"status": "error", "message": "Message must be a string"}, 400
-
-        sanitized_message = message.replace("\n", " ").replace("\\", "").strip()
-
-        alert_message = sanitized_message
+        alert_message = data.get("message", "Unknown alert received.")
         phone_number = data.get("phone_number", default_phone_number)
 
         pubsub_message = {
@@ -52,7 +36,7 @@ def handle_webhook():
             "text_message": alert_message
         }
 
-        future = publisher.publish(topic_path, json.dumps(pubsub_message).encode("utf-8"))
+        publisher.publish(topic_path, json.dumps(pubsub_message).encode("utf-8"))
         print(f"Published message to {topic_id} with phone number {phone_number}")
 
         return jsonify({"status": "success", "message": "Alert sent to Pub/Sub"}), 200
