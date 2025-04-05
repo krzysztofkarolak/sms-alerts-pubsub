@@ -11,14 +11,14 @@ project_id = os.environ.get("GOOGLE_PROJECT_NAME")
 topic_id = os.environ.get("PUBSUB_TOPIC_NAME")
 
 sa_key_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_KEY")
-#if not sa_key_json:
-#    raise ValueError("Service account key not found in the environment variable.")
+if not sa_key_json:
+    raise ValueError("Service account key not found in the environment variable.")
 
-#sa_key_dict = json.loads(sa_key_json)
-#credentials = service_account.Credentials.from_service_account_info(sa_key_dict)
+sa_key_dict = json.loads(sa_key_json)
+credentials = service_account.Credentials.from_service_account_info(sa_key_dict)
 
-#publisher = pubsub_v1.PublisherClient(credentials=credentials)
-#topic_path = publisher.topic_path(project_id, topic_id)
+publisher = pubsub_v1.PublisherClient(credentials=credentials)
+topic_path = publisher.topic_path(project_id, topic_id)
 
 default_phone_number = os.environ.get("DEFAULT_PHONE_NUMBER")
 
