@@ -24,7 +24,11 @@ spec:
       annotations:
         source_url: "git@github.com:krzysztofkarolak/sms-alerts-pubsub.git"
     spec:
-
+      {{- if .Values.nodeSelector.enabled }}
+      nodeSelector:
+        kubernetes.io/arch: {{ .Values.nodeSelector.arch | quote }}
+      {{- end }}
+      
       restartPolicy: Always
 
       imagePullSecrets:

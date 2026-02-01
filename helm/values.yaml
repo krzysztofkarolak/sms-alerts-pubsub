@@ -4,3 +4,6 @@ registrySecretName: ""
 appName: "sms-alerts-pubsub"
 namespace: "sms"
 defaultPhoneNumber: "123456789"
+nodeSelector:
+  enabled: true
+  arch: "amd64"
